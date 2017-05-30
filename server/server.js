@@ -23,10 +23,17 @@ io.on('connection',(socket) => {
   socket.emit('newMessage',welcomeMessage);
   socket.broadcast.emit('newMessage',broadcastMessage);
 
-  socket.on('createMessage', (message) => {
+  socket.on('createMessage', (message,callback) => {
     console.log(message);
 
-    io.emit('createMessage',generateMessage(message.from,message.text));
+    io.emit('newMessage',generateMessage(message.from,message.text));
+
+
+    //this is a bugfix 
+    if(typeof callback === "function") {
+      callback('hola from server');
+          //callback({data: ""});
+    }
     // io.emit('newMessage', {
     //   from:message.from,
     //   text:message.text,
@@ -38,11 +45,11 @@ io.on('connection',(socket) => {
     //   text:message.text,
     //   createdAt:new Date().getTime()
     // })
-  })
+  });
   socket.on('disconnect', () => {
     console.log("Client disconnected.")
-  })
-})
+  });
+});
 
 
 server.listen(port, () => {
