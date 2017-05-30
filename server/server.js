@@ -3,6 +3,8 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
+var {generateMessage} = require('./utils/message');
+
 const publicPath = path.join(__dirname,'../public');
 const port = process.env.PORT || 3000;
 var app = express();
@@ -14,14 +16,9 @@ app.use(express.static(publicPath));
 io.on('connection',(socket) => {
   console.log("new user conncected.");
 
-  var welcomeMessage = {
-    from:'Admin',
-    text:'welcome to the chat app'
-  };
-  var broadcastMessage = {
-    from:'Admin',
-    text:'new user joined.'
-  };
+
+  var welcomeMessage = generateMessage('Admin','welcome to the chat app');
+  var broadcastMessage = generateMessage('Admin','new user joined');
 
   socket.emit('newMessage',welcomeMessage);
   socket.broadcast.emit('newMessage',broadcastMessage);
@@ -29,6 +26,7 @@ io.on('connection',(socket) => {
   socket.on('createMessage', (message) => {
     console.log(message);
 
+    io.emit('createMessage',generateMessage(message.from,message.text));
     // io.emit('newMessage', {
     //   from:message.from,
     //   text:message.text,
