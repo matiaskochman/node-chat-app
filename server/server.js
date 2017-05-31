@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
-var {generateMessage} = require('./utils/message');
+var {generateMessage,generateLocationMessage} = require('./utils/message');
 
 const publicPath = path.join(__dirname,'../public');
 const port = process.env.PORT || 3000;
@@ -29,22 +29,16 @@ io.on('connection',(socket) => {
     io.emit('newMessage',generateMessage(message.from,message.text));
 
 
-    //this is a bugfix 
+    //this is a bugfix
     if(typeof callback === "function") {
       callback('hola from server');
           //callback({data: ""});
     }
-    // io.emit('newMessage', {
-    //   from:message.from,
-    //   text:message.text,
-    //   createdAt:new Date().getTime()
-    // })
 
-    // socket.broadcast.emit('newMessage',{
-    //   from:message.from,
-    //   text:message.text,
-    //   createdAt:new Date().getTime()
-    // })
+  });
+  socket.on('createLocationMessage', (pos) => {
+    console.log('pekerman 0')
+    io.emit('newLocationMessage',generateLocationMessage('Admin',pos.latitude,pos.longitude));
   });
   socket.on('disconnect', () => {
     console.log("Client disconnected.")

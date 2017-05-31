@@ -16,6 +16,15 @@ $(document).ready(function(){
     $('#messages').append(li);
   });
 
+  socket.on('newLocationMessage',function(message){
+    console.log('pekerman 1')
+    var li = $('<li></li>');
+    var a = $('<a target="_blank">My Current Location</a>');
+    li.text(`${message.from}: `);
+    a.attr('href',message.url);
+    li.append(a);
+    $('#messages').append(li);
+  })
 
   $("#message-form").on('submit',function(e){
     e.preventDefault();
@@ -26,5 +35,26 @@ $(document).ready(function(){
 
     $('[name=message]').val('');
 
+  });
+
+  var locbutton = $("#send-location");
+
+  locbutton.on('click',function(){
+    if(!navigator.geolocation){
+      return alert("Geolocation not supported for your browser");
+    }
+
+    navigator.geolocation.getCurrentPosition(function(position){
+
+      var position = {
+        latitude:position.coords.latitude,
+        longitude:position.coords.longitude
+      }
+
+      socket.emit('createLocationMessage',position);
+      //console.log(position);
+    },function(){
+      console.log('unable to fetch postion');
+    })
   });
 });
